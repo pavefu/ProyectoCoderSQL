@@ -1,0 +1,154 @@
+create database if not exists mesa_de_entradas_DGAOS_NUEVA;
+
+use mesa_de_entradas_DGAOS_NUEVA;
+
+create table if not exists carpeta(
+	id_carpeta int primary key not null unique auto_increment,
+    nombre_carpeta varchar(40) not null unique
+    );
+    
+create table if not exists tipo_acto_administrativo(
+	id_tipo_acto_administrativo int primary key not null unique auto_increment,
+    nombre_tipo_acto_administrativo varchar(24) not null unique
+    );
+
+create table if not exists acto_administrativo(
+	id_acto_administrativo int primary key not null unique auto_increment,
+    id_tipo_acto_administrativo int not null,
+    numero_acto_administrativo varchar(24) not null,
+    FOREIGN KEY (id_tipo_acto_administrativo) REFERENCES tipo_acto_administrativo(id_tipo_acto_administrativo)
+    );
+
+create table if not exists sector(
+	id_sector int primary key not null unique auto_increment,
+    nombre_sector varchar(24) not null unique
+    );
+
+create table if not exists agente(
+	id_agente int primary key not null unique auto_increment,
+    id_sector int not null,
+    nombre_agente varchar(40) not null,
+    FOREIGN KEY (id_sector) REFERENCES sector(id_sector)
+    );
+
+create table if not exists departamento_judicial(
+	id_departamento_judicial int primary key not null unique auto_increment,
+    nombre_departamento_judicial varchar(24) not null unique
+    );
+
+create table if not exists distritos_por_deptojudicial(
+	id_distritos_por_deptojudicial int primary key not null unique auto_increment,
+    id_departamento_judicial int not null,
+    nombre_distrito varchar(60) not null,
+    FOREIGN KEY (id_departamento_judicial) REFERENCES departamento_judicial(id_departamento_judicial)
+    );
+
+create table if not exists tipo_documento(
+	id_tipo_documento int primary key not null unique auto_increment,
+    nombre_tipo_documento varchar(40) not null unique
+    );
+
+create table if not exists origen_destino(
+	id_origen_destino int primary key not null unique auto_increment,
+    nombre_origen_destino varchar(85) not null unique
+    );
+
+create table if not exists forma_ingreso(
+	id_forma_ingreso int primary key not null unique auto_increment,
+    nombre_forma_ingreso varchar(24) not null unique
+    );
+    
+create table if not exists facsimil_ingreso(
+	id_facsimiling int primary key not null unique auto_increment,
+    ruta_facsimil varchar(100)
+    );
+
+create table if not exists trg_bitacora_facsimil (
+id_bitacora_facsimil int not null auto_increment,
+fecha datetime not null,
+usuario_id varchar(45),
+old_ruta_facsimil varchar (100),
+new_ruta_facsimil varchar (100),
+tipo_operacion varchar(45),
+primary key(id_bitacora_facsimil));
+
+create table if not exists maestro_mesa_entradas(
+	id_ingreso int primary key not null unique auto_increment,
+    id_forma_ingreso int,
+    FOREIGN KEY (id_forma_ingreso) REFERENCES forma_ingreso(id_forma_ingreso),
+    id_origen int,
+    FOREIGN KEY (id_origen) REFERENCES origen_destino(id_origen_destino),
+    facsimil_ingreso varchar(100),
+    id_tipo_documento int not null,
+    FOREIGN KEY (id_tipo_documento) REFERENCES tipo_documento(id_tipo_documento),
+    nro_documento varchar(24),
+    id_distritos_por_deptojudicial int not null,
+    FOREIGN KEY (id_distritos_por_deptojudicial) REFERENCES distritos_por_deptojudicial(id_distritos_por_deptojudicial),
+    detalle_documento text not null,
+    id_sector_asignado int not null,
+    FOREIGN KEY (id_sector_asignado) REFERENCES sector(id_sector),
+    id_responsable int not null,
+    FOREIGN KEY (id_responsable) REFERENCES agente(id_agente),
+    id_acto_administrativo_asociado int,
+    FOREIGN KEY (id_acto_administrativo_asociado) REFERENCES acto_administrativo(id_acto_administrativo),
+    id_salida int,
+    id_destino int,
+    FOREIGN KEY (id_destino) REFERENCES origen_destino(id_origen_destino),
+    facsimil_salida varchar(100),
+    id_carpeta int not null,
+    FOREIGN KEY (id_carpeta) REFERENCES carpeta(id_carpeta)
+    );
+    
+    create table if not exists backup_ingreso_maestro_mesa_entradas(
+	id_ingreso int primary key not null unique,
+    id_forma_ingreso int,
+    FOREIGN KEY (id_forma_ingreso) REFERENCES forma_ingreso(id_forma_ingreso),
+    id_origen int,
+    FOREIGN KEY (id_origen) REFERENCES origen_destino(id_origen_destino),
+    facsimil_ingreso varchar(100),
+    id_tipo_documento int not null,
+    FOREIGN KEY (id_tipo_documento) REFERENCES tipo_documento(id_tipo_documento),
+    nro_documento varchar(24),
+    id_distritos_por_deptojudicial int not null,
+    FOREIGN KEY (id_distritos_por_deptojudicial) REFERENCES distritos_por_deptojudicial(id_distritos_por_deptojudicial),
+    detalle_documento text not null,
+    id_sector_asignado int not null,
+    FOREIGN KEY (id_sector_asignado) REFERENCES sector(id_sector),
+    id_responsable int not null,
+    FOREIGN KEY (id_responsable) REFERENCES agente(id_agente),
+    id_acto_administrativo_asociado int,
+    FOREIGN KEY (id_acto_administrativo_asociado) REFERENCES acto_administrativo(id_acto_administrativo),
+    id_salida int,
+    id_destino int,
+    FOREIGN KEY (id_destino) REFERENCES origen_destino(id_origen_destino),
+    facsimil_salida varchar(100),
+    id_carpeta int not null,
+    FOREIGN KEY (id_carpeta) REFERENCES carpeta(id_carpeta)
+    );
+    
+    create table if not exists backup_resgistrosborrados_maestro_mesa_entradas(
+	id_ingreso int primary key not null unique,
+    id_forma_ingreso int,
+    FOREIGN KEY (id_forma_ingreso) REFERENCES forma_ingreso(id_forma_ingreso),
+    id_origen int,
+    FOREIGN KEY (id_origen) REFERENCES origen_destino(id_origen_destino),
+    facsimil_ingreso varchar(100),
+    id_tipo_documento int not null,
+    FOREIGN KEY (id_tipo_documento) REFERENCES tipo_documento(id_tipo_documento),
+    nro_documento varchar(24),
+    id_distritos_por_deptojudicial int not null,
+    FOREIGN KEY (id_distritos_por_deptojudicial) REFERENCES distritos_por_deptojudicial(id_distritos_por_deptojudicial),
+    detalle_documento text not null,
+    id_sector_asignado int not null,
+    FOREIGN KEY (id_sector_asignado) REFERENCES sector(id_sector),
+    id_responsable int not null,
+    FOREIGN KEY (id_responsable) REFERENCES agente(id_agente),
+    id_acto_administrativo_asociado int,
+    FOREIGN KEY (id_acto_administrativo_asociado) REFERENCES acto_administrativo(id_acto_administrativo),
+    id_salida int,
+    id_destino int,
+    FOREIGN KEY (id_destino) REFERENCES origen_destino(id_origen_destino),
+    facsimil_salida varchar(100),
+    id_carpeta int not null,
+    FOREIGN KEY (id_carpeta) REFERENCES carpeta(id_carpeta)
+    );
