@@ -1,3 +1,5 @@
+use mesa_de_entradas_dgaos_nueva;
+
 create view vw_general_movimiento as 
 select
 	maestro_mesa_entradas.id_ingreso as ingreso,
