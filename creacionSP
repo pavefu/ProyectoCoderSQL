@@ -1,3 +1,6 @@
+use mesa_de_entradas_dgaos_nueva;
+
+
 DELIMITER //
 
 create procedure check_duplicado (in facsimil_entrada varchar(100))
