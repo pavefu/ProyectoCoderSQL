@@ -1,0 +1,41 @@
+create trigger backup_ingreso_maestro 
+after insert on maestro_mesa_entradas 
+for each row 
+insert into backup_ingreso_maestro_mesa_entradas (id_ingreso, id_forma_ingreso, id_origen, facsimil_ingreso, id_tipo_documento, nro_documento, 
+			id_distritos_por_deptojudicial, detalle_documento, id_sector_asignado, id_responsable, id_acto_administrativo_asociado,
+            id_salida, id_destino, facsimil_salida, id_carpeta) values(new.id_ingreso, new.id_forma_ingreso, new.id_origen, new.facsimil_ingreso, 
+            new.id_tipo_documento, new.nro_documento, new.id_distritos_por_deptojudicial, new.detalle_documento, new.id_sector_asignado,
+            new.id_responsable, new.id_acto_administrativo_asociado, new.id_salida, new.id_destino, new.facsimil_salida, new.id_carpeta);
+
+DELIMITER //                            
+create trigger backup_registrosborrados_maestro
+before delete on maestro_mesa_entradas
+for each row
+begin 
+insert into backup_resgistrosborrados_maestro_mesa_entradas (id_ingreso, id_forma_ingreso, id_origen, facsimil_ingreso, id_tipo_documento, nro_documento, 
+			id_distritos_por_deptojudicial, detalle_documento, id_sector_asignado, id_responsable, id_acto_administrativo_asociado,
+            id_salida, id_destino, facsimil_salida, id_carpeta) values(old.id_ingreso, old.id_forma_ingreso, old.id_origen, old.facsimil_ingreso, 
+            old.id_tipo_documento, old.nro_documento, old.id_distritos_por_deptojudicial, old.detalle_documento, old.id_sector_asignado,
+            old.id_responsable, old.id_acto_administrativo_asociado, old.id_salida, old.id_destino, old.facsimil_salida, old.id_carpeta);
+end
+//
+    
+create trigger bitacora_actualizaciones_facsimil 
+after update on facsimil_ingreso
+for each row
+insert into trg_bitacora_facsimil (fecha,usuario_id,old_ruta_facsimil,new_ruta_facsimil,tipo_operacion)
+values
+(now(),session_user(),OLD.ruta_facsimil,NEW.ruta_facsimil,'se actualiza dato');
+
+DELIMITER //
+create trigger bitacora_registros_borrados_facsimil
+before delete on facsimil_ingreso
+for each row
+begin 
+insert into trg_bitacora_facsimil
+(fecha,usuario_id,old_ruta_facsimil,tipo_operacion)
+values
+(now(),session_user(),OLD.ruta_facsimil,'se borra dato');
+end;
+//
+
