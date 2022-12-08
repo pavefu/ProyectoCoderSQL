@@ -1,6 +1,86 @@
 use mesa_de_entradas_dgaos_nueva;
 
 
+
+								/* CREACIONES DE TABLA PARA DESAFIO TRIGGERS */
+
+-- Creacion de una nueva tabla de back up de la tabla maestro_mesa_entradas que registra los ingresos al sistema  --
+
+create table if not exists backup_ingreso_maestro_mesa_entradas(
+	id_ingreso int primary key not null unique,
+    id_forma_ingreso int,
+    FOREIGN KEY (id_forma_ingreso) REFERENCES forma_ingreso(id_forma_ingreso),
+    id_origen int,
+    FOREIGN KEY (id_origen) REFERENCES origen_destino(id_origen_destino),
+    facsimil_ingreso varchar(100),
+    id_tipo_documento int not null,
+    FOREIGN KEY (id_tipo_documento) REFERENCES tipo_documento(id_tipo_documento),
+    nro_documento varchar(24),
+    id_distritos_por_deptojudicial int not null,
+    FOREIGN KEY (id_distritos_por_deptojudicial) REFERENCES distritos_por_deptojudicial(id_distritos_por_deptojudicial),
+    detalle_documento text not null,
+    id_sector_asignado int not null,
+    FOREIGN KEY (id_sector_asignado) REFERENCES sector(id_sector),
+    id_responsable int not null,
+    FOREIGN KEY (id_responsable) REFERENCES agente(id_agente),
+    id_acto_administrativo_asociado int,
+    FOREIGN KEY (id_acto_administrativo_asociado) REFERENCES acto_administrativo(id_acto_administrativo),
+    id_salida int,
+    id_destino int,
+    FOREIGN KEY (id_destino) REFERENCES origen_destino(id_origen_destino),
+    facsimil_salida varchar(100),
+    id_carpeta int not null,
+    FOREIGN KEY (id_carpeta) REFERENCES carpeta(id_carpeta)
+    );
+    
+
+-- Creacion de una nueva tabla de back up de los registros borrados de la tabla maestro_mesa_entradas --
+
+create table if not exists backup_resgistrosborrados_maestro_mesa_entradas(
+	id_ingreso int primary key not null unique,
+    id_forma_ingreso int,
+    FOREIGN KEY (id_forma_ingreso) REFERENCES forma_ingreso(id_forma_ingreso),
+    id_origen int,
+    FOREIGN KEY (id_origen) REFERENCES origen_destino(id_origen_destino),
+    facsimil_ingreso varchar(100),
+    id_tipo_documento int not null,
+    FOREIGN KEY (id_tipo_documento) REFERENCES tipo_documento(id_tipo_documento),
+    nro_documento varchar(24),
+    id_distritos_por_deptojudicial int not null,
+    FOREIGN KEY (id_distritos_por_deptojudicial) REFERENCES distritos_por_deptojudicial(id_distritos_por_deptojudicial),
+    detalle_documento text not null,
+    id_sector_asignado int not null,
+    FOREIGN KEY (id_sector_asignado) REFERENCES sector(id_sector),
+    id_responsable int not null,
+    FOREIGN KEY (id_responsable) REFERENCES agente(id_agente),
+    id_acto_administrativo_asociado int,
+    FOREIGN KEY (id_acto_administrativo_asociado) REFERENCES acto_administrativo(id_acto_administrativo),
+    id_salida int,
+    id_destino int,
+    FOREIGN KEY (id_destino) REFERENCES origen_destino(id_origen_destino),
+    facsimil_salida varchar(100),
+    id_carpeta int not null,
+    FOREIGN KEY (id_carpeta) REFERENCES carpeta(id_carpeta)
+    );
+
+-- Creacion de tabla para bitacora de actualizacion y borrado de registros en las rutas de los facsimiles --
+
+create table if not exists trg_bitacora_facsimil (
+id_bitacora_facsimil int not null auto_increment,
+fecha datetime not null,
+usuario_id varchar(45),
+old_ruta_facsimil varchar (100),
+new_ruta_facsimil varchar (100),
+tipo_operacion varchar(45),
+primary key(id_bitacora_facsimil));
+
+    
+
+								/* TRIGGERS AFTER */
+
+
+-- Trigger after maestro_mesa_entradas: resuelve la guarda de los datos que se creen en la tabla maestro, generando un espejo o backup del que se puedan rescatar datos --
+    
 create trigger backup_ingreso_maestro 
 after insert on maestro_mesa_entradas 
 for each row 
@@ -9,6 +89,34 @@ insert into backup_ingreso_maestro_mesa_entradas (id_ingreso, id_forma_ingreso, 
             id_salida, id_destino, facsimil_salida, id_carpeta) values(new.id_ingreso, new.id_forma_ingreso, new.id_origen, new.facsimil_ingreso, 
             new.id_tipo_documento, new.nro_documento, new.id_distritos_por_deptojudicial, new.detalle_documento, new.id_sector_asignado,
             new.id_responsable, new.id_acto_administrativo_asociado, new.id_salida, new.id_destino, new.facsimil_salida, new.id_carpeta);
+    
+-- Ingreso de datos para prueba --
+
+insert into maestro_mesa_entradas (id_forma_ingreso, id_origen, facsimil_ingreso, id_tipo_documento, nro_documento, 
+			id_distritos_por_deptojudicial, detalle_documento, id_sector_asignado, id_responsable, id_acto_administrativo_asociado,
+            id_salida, id_destino, facsimil_salida, id_carpeta) values (2, 119, 'trabajopracticotriggernuevoregistro1', 14, '2A', 1, 'trabajopracticotriggernuevoregistro1',
+            3, 13, 305, 26, 12, 'trabajopracticotriggernuevoregistro1', 13);
+
+
+-- Trigger after tabla facsimil_ingreso: registra actualizaciones en la tabla --
+
+create trigger bitacora_actualizaciones_facsimil 
+after update on facsimil_ingreso
+for each row
+insert into trg_bitacora_facsimil (fecha,usuario_id,old_ruta_facsimil,new_ruta_facsimil,tipo_operacion)
+values
+(now(),session_user(),OLD.ruta_facsimil,NEW.ruta_facsimil,'se actualiza dato');
+
+-- Actualizacion de datos para prueba --
+
+update facsimil_ingreso set ruta_facsimil='cambiandoparaprueba' where id_facsimiling=3 ;
+
+
+
+								/* TRIGGERS BEFORE */
+
+
+-- Trigger before tabla maestro_mesa_entradas: registra el borrado de filas de la tabla, permitiendo almacenar el viejo dato del ingreso--
 
 DELIMITER //                            
 create trigger backup_registrosborrados_maestro
@@ -22,13 +130,13 @@ insert into backup_resgistrosborrados_maestro_mesa_entradas (id_ingreso, id_form
             old.id_responsable, old.id_acto_administrativo_asociado, old.id_salida, old.id_destino, old.facsimil_salida, old.id_carpeta);
 end
 //
-    
-create trigger bitacora_actualizaciones_facsimil 
-after update on facsimil_ingreso
-for each row
-insert into trg_bitacora_facsimil (fecha,usuario_id,old_ruta_facsimil,new_ruta_facsimil,tipo_operacion)
-values
-(now(),session_user(),OLD.ruta_facsimil,NEW.ruta_facsimil,'se actualiza dato');
+
+-- Borrado de datos para prueba --
+
+delete from maestro_mesa_entradas where id_ingreso=8722;
+
+
+-- Trigger before tabla facsimil_ingreso: registra el borrado de filas de la tabla, permitiendo almacenar el viejo dato de la ruta del facsimil--
 
 DELIMITER //
 create trigger bitacora_registros_borrados_facsimil
@@ -42,3 +150,5 @@ values
 end;
 //
 
+-- Borrado de datos para prueba --
+delete from facsimil_ingreso where id_facsimiling=21;
