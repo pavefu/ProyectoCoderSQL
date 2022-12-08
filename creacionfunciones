@@ -2,6 +2,10 @@ use mesa_de_entradas_dgaos_nueva;
 
 delimiter // 
 
+
+/* Esta función permite la búsqueda de agentes a traves de sus identificadores */
+
+
 create function ver_nombre (id int) returns varchar (150)
 deterministic
 begin
@@ -13,6 +17,8 @@ begin
 
 DELIMITER //
 
+/* Esta función permite la búsqueda de los sectores en los que estos agentes trabajan */
+
 CREATE FUNCTION sector_del_agente (ingrese_id_agente int) returns varchar(255)
 deterministic
 begin
@@ -21,4 +27,3 @@ begin
 	return respuesta;
     end;
     //
-    
