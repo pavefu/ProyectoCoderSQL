@@ -1,3 +1,6 @@
+use mesa_de_entradas_dgaos_nueva;
+
+
 create trigger backup_ingreso_maestro 
 after insert on maestro_mesa_entradas 
 for each row 
