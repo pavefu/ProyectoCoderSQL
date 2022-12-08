@@ -1,5 +1,8 @@
 use mesa_de_entradas_dgaos_nueva;
 
+/* El proposito de este SP es ingresar en la tabla facsimil_ingreso una ruta donde esta guardado
+ el objeto facsimilar de la entrada, por ejemplo un archivo pdf. Para ello se creo una nueva tabla (facsimil_ingreso)
+ que no existia */
 
 DELIMITER //
 
@@ -10,10 +13,12 @@ begin
     else
     insert into facsimil_ingreso values (id_facsimiling, facsimil_entrada);
     end if;
- end//
-
-
-DELIMITER $$
+ end
+ //
+ 
+ /* el proposito de este procedimiento es permitir ordenar ascendente o descendentemente por campo dentro de una tabla o vista*/
+ 
+ DELIMITER $$
 CREATE PROCEDURE sp_ordenar_tabla( IN campo VARCHAR(255) , IN tipo_ordenamiento ENUM('ASC' ,'DESC',''), IN tabla VARCHAR(200) )
 BEGIN
     
@@ -37,4 +42,3 @@ BEGIN
     
 END $$
 DELIMITER ;
-
