@@ -1,0 +1,63 @@
+create view vw_general_movimiento as 
+select
+	maestro_mesa_entradas.id_ingreso as ingreso,
+    forma_ingreso.nombre_forma_ingreso as forma,
+    origen_destino.nombre_origen_destino as origen,
+    tipo_documento.nombre_tipo_documento as tipo_documento,
+    maestro_mesa_entradas.nro_documento as numero,
+    maestro_mesa_entradas.detalle_documento as detalle,
+    sector.nombre_sector as sector,
+    agente.nombre_agente as responsable,
+    maestro_mesa_entradas.id_salida as nro_salida,
+    maestro_mesa_entradas.id_destino as destino,
+    carpeta.nombre_carpeta as carpeta
+
+from 
+	(maestro_mesa_entradas
+    join forma_ingreso on (maestro_mesa_entradas.id_forma_ingreso = forma_ingreso.id_forma_ingreso)
+    join origen_destino on (maestro_mesa_entradas.id_origen = origen_destino.id_origen_destino)
+    join tipo_documento on (maestro_mesa_entradas.id_tipo_documento = tipo_documento.id_tipo_documento)
+    join sector on (maestro_mesa_entradas.id_sector_asignado = id_sector)
+    join agente on (maestro_mesa_entradas.id_responsable = id_agente)
+    join carpeta on (maestro_mesa_entradas.id_carpeta = carpeta.id_carpeta)
+    );
+    
+    create view vw_contador_tramites as
+
+select count(id_ingreso) as cantidad_tramites from maestro_mesa_entradas
+;
+
+create view vw_contador_movimiento_destino as
+
+select
+	origen_destino.nombre_origen_destino as nombre_destino,
+    vw_general_movimiento.destino,
+    count(destino) as contador
+
+from 
+	(vw_general_movimiento
+    join origen_destino on (vw_general_movimiento.destino = origen_destino.id_origen_destino))
+    group by origen_destino.nombre_origen_destino;
+
+create view vw_cantidad_tramites_sector as
+
+select sector, count(ingreso) as contador from vw_general_movimiento
+group by sector;
+
+create view vw_cantidad_tramites_agente as
+
+select responsable, count(ingreso) as contador from vw_general_movimiento
+group by responsable;
+
+create view vw_sector_por_agente as
+
+select 
+	agente.id_agente as id,
+    sector.nombre_sector as sector,
+    agente.nombre_agente as agente
+
+from
+	(agente
+    join sector on (agente.id_sector = sector.id_sector));
+    
+    
