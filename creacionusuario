@@ -1,0 +1,15 @@
+use mysql;
+
+/* PRIMER USUARIO */
+/* Creacion de usuario que tiene permiso de solo lectura de todas las tablas de la base */
+create user 'usuario1'@'localhost' identified by '1234';
+
+/* el permiso habilitado es el que facilita la lectura de todas las tabla de la base*/
+grant select on mesa_de_entradas_dgaos_nueva.* to 'usuario1'@'localhost';
+
+/* SEGUNDO USUARIO */
+/* Creación de usuario que tiene permiso de lectura, inserción y actualización de datos de todas las tablas de la base */
+create user 'usuario2'@'localhost' identified by 'coderhouse';
+
+/* el permiso habilitado es el que facilita la lectura, inserción y actualización de datos de todas las tablas de la base */
+grant select, insert, update on mesa_de_entradas_dgaos_nueva.* to 'usuario2'@'localhost';
