@@ -1,0 +1,22 @@
+    delimiter // 
+
+create function ver_nombre (id int) returns varchar (150)
+deterministic
+begin
+	declare nombre varchar (150);
+    set nombre = (select nombre_agente from mesa_de_entradas_dgaos_nueva.agente where id_agente= id);
+    return nombre;
+    end;
+    //
+
+DELIMITER //
+
+CREATE FUNCTION sector_del_agente (ingrese_id_agente int) returns varchar(255)
+deterministic
+begin
+	declare respuesta varchar(255);
+    set respuesta = (select	sector from vw_sector_por_agente where id=ingrese_id_agente);
+	return respuesta;
+    end;
+    //
+    
