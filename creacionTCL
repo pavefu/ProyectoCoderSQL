@@ -1,0 +1,39 @@
+use mesa_de_entradas_dgaos_nueva;
+
+set autocommit=0;
+
+insert into facsimil_ingreso (id_facsimiling, ruta_facsimil) values (24, '2');
+
+start transaction;
+delete from facsimil_ingreso where id_facsimiling=24;
+
+/* Para volver al estado original */
+rollback;
+
+/* para confirmar la operación de borrado*/
+commit;
+
+
+start transaction;
+savepoint inicio;
+insert into forma_ingreso (id_forma_ingreso, nombre_forma_ingreso) values (7,'prueba1');
+insert into forma_ingreso (id_forma_ingreso, nombre_forma_ingreso) values (8,'prueba2');
+insert into forma_ingreso (id_forma_ingreso, nombre_forma_ingreso) values (9,'prueba3');
+insert into forma_ingreso (id_forma_ingreso, nombre_forma_ingreso) values (10,'prueba4');
+savepoint tramo1a4;
+insert into forma_ingreso (id_forma_ingreso, nombre_forma_ingreso) values (11,'prueba5');
+insert into forma_ingreso (id_forma_ingreso, nombre_forma_ingreso) values (12,'prueba6');
+insert into forma_ingreso (id_forma_ingreso, nombre_forma_ingreso) values (13,'prueba7');
+insert into forma_ingreso (id_forma_ingreso, nombre_forma_ingreso) values (14,'prueba8');
+savepoint tramo5a8;
+insert into forma_ingreso (id_forma_ingreso, nombre_forma_ingreso) values (15,'prueba9');
+insert into forma_ingreso (id_forma_ingreso, nombre_forma_ingreso) values (16,'prueba10');
+insert into forma_ingreso (id_forma_ingreso, nombre_forma_ingreso) values (17,'prueba11');
+insert into forma_ingreso (id_forma_ingreso, nombre_forma_ingreso) values (18,'prueba12');
+
+/* Para volver al ultimo registro de id 10 */
+rollback to tramo1a4;
+
+/* Este comando desactiva el safepoint colocado despues del registro de id 14. Se puso alli para verificar en el rollback 
+anterior que se realizo la carga hasta el registro 10  */
+release savepoint tramo5a8;
