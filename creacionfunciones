@@ -1,4 +1,6 @@
-    delimiter // 
+use mesa_de_entradas_dgaos_nueva;
+
+delimiter // 
 
 create function ver_nombre (id int) returns varchar (150)
 deterministic
